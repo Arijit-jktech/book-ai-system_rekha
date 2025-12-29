@@ -96,7 +96,7 @@ class TestBookEndpoints:
         assert isinstance(data["items"], list)
 
     @pytest.mark.asyncio
-    async def test_get_book_by_id_success(self, client: TestClient):
+    async def test_get_book_by_id_success(self, client: TestClient, admin_headers: dict):
         """Test retrieving a specific book by ID."""
         # First create a book
         book_data = {

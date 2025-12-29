@@ -330,8 +330,10 @@ class BookSummary(BaseModel):
 
 class GenerateSummaryRequest(BaseModel):
     """Generate summary request."""
-    content: str = Field(..., min_length=50)
-    max_length: Optional[int] = Field(500, ge=100, le=2000)
+    title: str = Field(..., min_length=1, max_length=200)
+    author: str = Field(..., min_length=1, max_length=100)
+    content: str = Field(..., min_length=1)
+    max_length: Optional[int] = Field(500, ge=50, le=2000)
 
 
 class GenerateSummaryResponse(BaseModel):
@@ -372,3 +374,12 @@ class ErrorResponse(BaseModel):
 
 # Update forward references
 BookWithReviews.model_rebuild()
+
+
+class PaginatedBooksResponse(BaseModel):
+    """Paginated list response for books."""
+
+    items: List[Book]
+    total: int
+    page: int
+    size: int

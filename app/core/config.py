@@ -1,69 +1,73 @@
-"""Core Configuration Module for the Book Management system"""
-
+"""
+Core configuration module for the Book Management System.
+"""
 from functools import lru_cache
-from typing import List, Optional,Union
+from typing import List, Optional, Union
 
+from pydantic_settings import BaseSettings
+from pydantic import Field, validator
 
-from pydentic_setting import BaseSettings
-from pydentic import Field,validator
 
 class Settings(BaseSettings):
-    """application settings that automatically read from environment variables"""
+    """Application settings that automatically read from environment variables."""
     
-    #Application Settings
-    app_name: str =Field(
-        default="Intelligent Book Management System",
-        env="APP_NAME"
+    # Application Settings
+    app_name: str = Field(
+        default="Intelligent Book Management System", 
+        env="APP_NAME",
         description="Application name"
     )
-
-    app_version: str=Field(
-        default="1.0.0",
+    app_version: str = Field(
+        default="1.0.0", 
         env="APP_VERSION",
-        description="Application Version"
+        description="Application version"
     )
-
-    debug: bool =Field(
-        default=False,
+    debug: bool = Field(
+        default=False, 
         env="DEBUG",
-        decription="Debug mode flag"
+        description="Debug mode flag"
     )
-
-    Environment: str =Field(
-        default="developmenent",
+    environment: str = Field(
+        default="development", 
         env="ENVIRONMENT",
-        description="Environment (deveopment,statging)"
-
+        description="Environment (development, staging, production)"
     )
-
-    #Database Configuration
-    database_url: str =Field(
+    
+    # Database Configuration
+    database_url: str = Field(
+        ..., 
         env="DATABASE_URL",
-        description="async database connection URL"
-
+        description="Async database connection URL"
     )
-
-    #JWT AUthentication
-    secret_key: str =Field(
-        env="SECRETE_KEY",
-        description="JWT secrete key"
-
+    database_url_sync: Optional[str] = Field(
+        default=None, 
+        env="DATABASE_URL_SYNC",
+        description="Sync database connection URL (optional)"
     )
-
-    algorithm: str =Field(
-        default="HS256",
+    
+    # JWT Authentication
+    secret_key: str = Field(
+        ..., 
+        env="SECRET_KEY",
+        description="JWT secret key (minimum 32 characters)"
+    )
+    algorithm: str = Field(
+        default="HS256", 
         env="ALGORITHM",
-        decription="JWT signing algorithm"
+        description="JWT signing algorithm"
     )
-
-    access_token_expire_minutes: str=Field(
-        default=1440,
-        env="ACCESS_TOKEN_EXPIRE_MINUTE",
+    access_token_expire_minutes: int = Field(
+        default=1440, 
+        env="ACCESS_TOKEN_EXPIRE_MINUTES",
         description="JWT token expiration time in minutes"
-
     )
-
+    
     # AI Service Configuration
+    ai_provider: str = Field(
+        default="auto",
+        env="AI_PROVIDER",
+        description="AI provider mode: auto | openai_compat | ollama"
+    )
     ai_service_url: str = Field(
         default="http://localhost:11434", 
         env="AI_SERVICE_URL",
@@ -79,12 +83,27 @@ class Settings(BaseSettings):
         env="AI_MODEL_NAME",
         description="AI model name"
     )
+    ai_max_tokens: int = Field(
+        default=1024,
+        env="AI_MAX_TOKENS",
+        description="Default max tokens/num_predict for AI responses"
+    )
+    ai_temperature: float = Field(
+        default=0.7,
+        env="AI_TEMPERATURE",
+        description="Sampling temperature for AI responses"
+    )
+    ai_top_p: float = Field(
+        default=0.9,
+        env="AI_TOP_P",
+        description="Nucleus sampling probability for AI responses"
+    )
     ai_timeout: int = Field(
         default=300, 
         env="AI_TIMEOUT",
         description="AI service request timeout in seconds"
     )
-
+    
     # Redis Configuration (Optional for caching)
     redis_url: Optional[str] = Field(
         default=None, 
@@ -96,14 +115,14 @@ class Settings(BaseSettings):
         env="REDIS_PORT",
         description="Redis port"
     )
-
+    
     # CORS Configuration
     allowed_origins: Union[List[str], str] = Field(
         default=["http://localhost:3000", "http://localhost:8000", "http://127.0.0.1:3000"],
         env="ALLOWED_ORIGINS",
         description="Allowed CORS origins"
     )
-
+    
     # Pagination Settings
     default_page_size: int = Field(
         default=20, 
@@ -115,7 +134,7 @@ class Settings(BaseSettings):
         env="MAX_PAGE_SIZE",
         description="Maximum number of items per page"
     )
-
+    
     # Logging Configuration
     log_level: str = Field(
         default="INFO", 
@@ -127,14 +146,14 @@ class Settings(BaseSettings):
         env="LOG_FORMAT",
         description="Log format (json or text)"
     )
-
+    
     # Security Settings
     bcrypt_rounds: int = Field(
         default=12, 
         env="BCRYPT_ROUNDS",
         description="Number of bcrypt hashing rounds"
     )
-        
+    
     @validator("secret_key")
     def validate_secret_key(cls, v):
         """Validate that secret key is long enough."""

@@ -55,20 +55,8 @@ async def create_review(
         )
     
     review_service = ReviewService(db)
-    
-    # Check if user already reviewed this book
-    existing_review = await review_service.get_user_review_for_book(book_id, current_user.id)
-    if existing_review:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="You have already reviewed this book"
-        )
-    
-    review = await review_service.create_review(
-        book_id=book_id,
-        user_id=current_user.id,
-        review_data=review_data
-    )
+
+    review = await review_service.create_review(review_data, book_id, current_user.id)
     
     return review
 
@@ -144,11 +132,14 @@ async def update_review(
             detail="You can only update your own reviews"
         )
     
-    updated_review = await review_service.update_review(review_id, review_update)
-    return updated_review
+    try:
+        updated_review = await review_service.update_review(review_id, review_update, current_user.id)
+        return updated_review
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
 
 
-@router.delete("/{review_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{review_id}", status_code=status.HTTP_200_OK)
 async def delete_review(
     review_id: int,
     current_user: User = Depends(get_current_active_user),
@@ -173,12 +164,18 @@ async def delete_review(
             detail="You can only delete your own reviews"
         )
     
-    success = await review_service.delete_review(review_id)
+    try:
+        success = await review_service.delete_review(review_id, current_user.id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Review not found"
         )
+
+    return {"status": "deleted", "id": review_id}
 
 
 @router.get("/user/{user_id}", response_model=List[ReviewSchema])

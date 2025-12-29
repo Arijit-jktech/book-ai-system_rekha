@@ -15,6 +15,7 @@ from app.models.schemas import (
     BookUpdate, 
     BookWithReviews,
     BookSummary,
+    PaginatedBooksResponse,
     Review as ReviewSchema,
     ReviewCreate,
 )
@@ -62,7 +63,7 @@ async def create_book(
         )
 
 
-@router.get("/")
+@router.get("/", response_model=PaginatedBooksResponse)
 async def get_books(
     page: int = Query(1, ge=1, description="Page number"),
     size: int = Query(20, ge=1, le=100, description="Page size"),

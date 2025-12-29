@@ -323,7 +323,7 @@ class TestErrorHandlingIntegration:
     """Test error handling across different components."""
 
     @pytest.mark.asyncio
-    async def test_cascade_error_handling(self, client: TestClient, auth_headers: dict):
+    async def test_cascade_error_handling(self, client: TestClient, auth_headers: dict, admin_headers: dict):
         """Test error handling when multiple services fail."""
         
         # Test AI service failure during book creation

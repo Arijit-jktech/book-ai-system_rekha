@@ -13,7 +13,7 @@ class TestReviewEndpoints:
     """Test review management endpoints."""
 
     @pytest.mark.asyncio
-    async def test_add_review_success(self, client: TestClient, auth_headers: dict):
+    async def test_add_review_success(self, client: TestClient, auth_headers: dict, admin_headers: dict):
         """Test adding a review with valid data."""
         # First need to create a book
         book_data = {

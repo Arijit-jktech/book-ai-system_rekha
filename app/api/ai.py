@@ -33,8 +33,8 @@ async def generate_summary(
     try:
         ai_service = AIService()
         summary_response = await ai_service.generate_book_summary(
-            title="Custom Content",
-            author="Unknown",
+            title=request.title,
+            author=request.author,
             content=request.content,
             max_length=request.max_length or 500
         )
